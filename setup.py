@@ -6,8 +6,8 @@ with open('requirements.txt') as f:
 setup(
     name='tmle',
     version='0.1',
-    author='Lukasz Ambroziak'
-    description='Transfer learning'
+    author='Lukasz Ambroziak',
+    description='Transfer learning',
     long_description=open('README.md').read(),
     url='https://github.com/stasulam/tmle',
     install_requires=requirements,
