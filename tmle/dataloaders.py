@@ -4,9 +4,9 @@ import numpy as np
 import torch
 import torchvision
 
-from typing import Optional, List
+from typing import Optional, Tuple
 from torch.utils.data import Dataset, DataLoader
-from torchvision import datasets, transforms
+from torchvision import datasets
 
 
 class ImageFoldersDataset(object):
@@ -81,7 +81,7 @@ class ImageFoldersDataset(object):
             output_label_name: Optional[str] = None,
             *args,
             **kwargs
-    ) -> Optional[List[np.ndarray, np.ndarray]]:
+    ) -> Optional[Tuple[np.ndarray, np.ndarray]]:
         """
 
         :param img_shape:
@@ -97,7 +97,7 @@ class ImageFoldersDataset(object):
         for data_idx, data in enumerate(self.dataset):
             image, label = data
             images[data_idx] = image.permute(1, 2, 0).numpy()
-            labels[data_idx] = label.numpy()
+            labels[data_idx] = label
         if save:
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
@@ -116,3 +116,7 @@ class ImageFoldersDataset(object):
             return None
         else:
             return images, labels
+
+    @staticmethod
+    def _init_fn(worker_id):
+        np.random.seed(worker_id)
