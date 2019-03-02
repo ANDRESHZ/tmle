@@ -1,21 +1,33 @@
 import numpy as np
-import skimage
 
 from typing import Optional
 from skimage.feature import hog
-from sklearn.base import TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin
 
 
-class HOGTransformer(TransformerMixin):
+class HOGTransformer(BaseEstimator, TransformerMixin):
+    """ `HOGTransformer` implements methods that allow HOGDescriptor
+    to be a part o sklearn's Pipeline. `transform` method used `skimage.feature.hog`
+    to calculate histogram of oriented gradients.
 
+    :param img_shape: width and height of images (number of channels is not required).
+    :param orientations: number of bins in histograms.
+    :param pixel_per_cell: number of pixels in given cell.
+    :param cells_per_block: number of cells present in one block.
+    :param visualise:
+    :param transform_sqrt:
+    :param feature_vector:
+    :param multichannel:
+
+    """
     def __init__(
             self,
             img_shape: tuple = (224, 224),
             orientations: int = 9,
             pixels_per_cell: tuple = (8, 8),
             cells_per_block: tuple = (3, 3),
-            block_norm: Optional[bool] = None,
-            visualize: bool = False,
+            block_norm: Optional[bool] = 'L2-Hys',
+            visualise: bool = False,
             transform_sqrt: bool = False,
             feature_vector: bool = True,
             multichannel: Optional[bool] = None
@@ -26,7 +38,7 @@ class HOGTransformer(TransformerMixin):
         self.pixels_per_cell = pixels_per_cell
         self.cells_per_block = cells_per_block
         self.block_norm = block_norm
-        self.visualize = visualize
+        self.visualise = visualise
         self.transform_sqrt = transform_sqrt
         self.feature_vector = feature_vector
         self.multichannel = multichannel
@@ -50,7 +62,7 @@ class HOGTransformer(TransformerMixin):
                 pixels_per_cell=self.pixels_per_cell,
                 cells_per_block=self.cells_per_block,
                 block_norm=self.block_norm,
-                visualise=self.visualize,
+                visualise=self.visualise,
                 transform_sqrt=self.transform_sqrt,
                 feature_vector=self.feature_vector,
                 multichannel=self.multichannel
