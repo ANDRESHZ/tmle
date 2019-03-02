@@ -1,3 +1,12 @@
+# Prevent data from going to remote repo
+dataset/
+data/
+.DS_Store
+*.tar
+
+# IDE
+.idea
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
