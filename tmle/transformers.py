@@ -14,7 +14,7 @@ class HOGTransformer(BaseEstimator, TransformerMixin):
     :param orientations: number of bins in histograms.
     :param pixel_per_cell: number of pixels in given cell.
     :param cells_per_block: number of cells present in one block.
-    :param visualise:
+    :param visualize:
     :param transform_sqrt:
     :param feature_vector:
     :param multichannel:
@@ -27,7 +27,7 @@ class HOGTransformer(BaseEstimator, TransformerMixin):
             pixels_per_cell: tuple = (8, 8),
             cells_per_block: tuple = (3, 3),
             block_norm: Optional[bool] = 'L2-Hys',
-            visualise: bool = False,
+            visualize: bool = False,
             transform_sqrt: bool = False,
             feature_vector: bool = True,
             multichannel: Optional[bool] = None
@@ -38,7 +38,7 @@ class HOGTransformer(BaseEstimator, TransformerMixin):
         self.pixels_per_cell = pixels_per_cell
         self.cells_per_block = cells_per_block
         self.block_norm = block_norm
-        self.visualise = visualise
+        self.visualize = visualize
         self.transform_sqrt = transform_sqrt
         self.feature_vector = feature_vector
         self.multichannel = multichannel
@@ -62,7 +62,7 @@ class HOGTransformer(BaseEstimator, TransformerMixin):
                 pixels_per_cell=self.pixels_per_cell,
                 cells_per_block=self.cells_per_block,
                 block_norm=self.block_norm,
-                visualise=self.visualise,
+                visualize=self.visualize,
                 transform_sqrt=self.transform_sqrt,
                 feature_vector=self.feature_vector,
                 multichannel=self.multichannel
