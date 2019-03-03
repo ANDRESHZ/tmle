@@ -62,7 +62,7 @@ class TransferLearning:
                     running_loss = 0.0
             accuracy_train = self.score(train_dataset)
             accuracy_test = self.score(test_dataset)
-            msg = '[%d] train score: %:.3f, test score: %:.3f'
+            msg = '[%d] train score: %.3f, test score: %.3f'
             print(msg % (epoch + 1, accuracy_train, accuracy_test))
             if accuracy_test > best_accuracy_test:
                 # TODO(lukasz): save model state
