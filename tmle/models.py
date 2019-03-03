@@ -51,8 +51,8 @@ class TransferLearning:
                     labels = labels.to(torch.device('cuda:0'))
                 self.optimizer.zero_grad()
                 outputs = self.model(inputs)
-                loss = criterion(outputs, labels)
-                optimizer.step()
+                loss = self.criterion(outputs, labels)
+                self.optimizer.step()
                 running_loss += loss.item()
                 if data_idx % 100 == 0:
                     msg = '[%d, %5d] loss: %.3f'
