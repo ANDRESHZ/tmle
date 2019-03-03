@@ -131,5 +131,7 @@ class ClassifierOptimizer(object):
         :param experiments_name:
         :return:
         """
-        with open(os.path.join(experiments_path, '.'.join([experiments_name, 'hpopt'])), 'rb') as experiments:
+        if not os.path.exists(experiments_path):
+            os.makedirs(experiments_path)
+        with open(os.path.join(experiments_path, '.'.join([experiments_name, 'hpopt'])), 'wb') as experiments:
             pickle.dump(trials, experiments)
