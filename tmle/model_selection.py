@@ -126,6 +126,7 @@ class ClassifierOptimizer(object):
     ) -> None:
         """
 
+        :param trials:
         :param experiments_path:
         :param experiments_name:
         :return:
