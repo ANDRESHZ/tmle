@@ -53,6 +53,7 @@ class TransferLearning:
                 self.optimizer.zero_grad()
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, labels)
+                loss.backward()
                 self.optimizer.step()
                 running_loss += loss.item()
                 if data_idx % 100 == 0:
