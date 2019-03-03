@@ -14,21 +14,11 @@ from .dataloaders import ImageFoldersDataset
 
 class TransferLearning:
 
-    def __init__(
+    def train(
             self,
             model: torchvision.models,
             criterion: torch.nn,
-            optimizer: torch.optim
-    ) -> None:
-
-        self.model = model
-        self.criterion = criterion
-        self.optimizer = optimizer
-        self.best_model = None
-        self.metrics = None
-
-    def train(
-            self,
+            optimizer: torch.optim,
             train_dataset: ImageFoldersDataset,
             test_dataset: ImageFoldersDataset,
             model_dir: Optional[str] = None,
@@ -60,19 +50,19 @@ class TransferLearning:
                 if torch.cuda.is_available():
                     inputs = inputs.to(torch.device('cuda:0'))
                     labels = labels.to(torch.device('cuda:0'))
-                self.optimizer.zero_grad()
-                outputs = self.model(inputs)
-                loss = self.criterion(outputs, labels)
+                optimizer.zero_grad()
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
                 loss.backward()
-                self.optimizer.step()
+                optimizer.step()
                 running_loss += loss.item()
                 if data_idx % 100 == 0:
                     msg = '[%d, %5d] loss: %.3f'
                     print(msg % (epoch + 1, data_idx + 1, running_loss / 100))
                     running_loss = 0.0
             # TODO(lukasz): measure accuracy_train during training.
-            accuracy_train = self.score(train_dataset)
-            accuracy_test = self.score(test_dataset)
+            accuracy_train = self.score(model, train_dataset)
+            accuracy_test = self.score(model, test_dataset)
             metrics['acc_train'].append(accuracy_train)
             metrics['acc_test'].append(accuracy_test)
             msg = '[%d] train score: %.3f, test score: %.3f'
@@ -80,16 +70,13 @@ class TransferLearning:
             # save model (make sure that Google Colab do not destroy your results).
             if accuracy_test > best_accuracy_test:
                 torch.save(
-                    self.model,
+                    model,
                     os.path.join(model_dir, '.'.join([
                         model_name + '_' + time.strftime('%Y%m%d%H%M', time.localtime(time.time())),
                         'pth'])))
                 best_accuracy_test = accuracy_test
 
-        self.metrics = metrics
-        return self
-
-    def score(self, dataset: ImageFoldersDataset) -> float:
+    def score(self, model, dataset: ImageFoldersDataset) -> float:
         """
 
         :param dataset:
@@ -98,7 +85,7 @@ class TransferLearning:
         with torch.no_grad():
             # remember that you must call `model.eval()` to set dropout and batch
             # normalization layers to evaluation mode before running the inference.
-            self.model.eval()
+            model.eval()
             y_true, y_pred = np.zeros(len(dataset)), np.zeros(len(dataset))
             batch_idx = 0
             for data in dataset.loader(batch_size=32):
@@ -106,7 +93,7 @@ class TransferLearning:
                 if torch.cuda.is_available():
                     inputs = inputs.to(torch.device('cuda:0'))
                     labels = labels.to(torch.device('cuda:0'))
-                outputs = self.model(inputs)
+                outputs = model(inputs)
                 _, pred = torch.max(outputs.data, 1)
                 batch_size = labels.size(0)
                 y_true[batch_idx:batch_idx+batch_size] = labels.cpu().numpy()
