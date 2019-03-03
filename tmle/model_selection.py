@@ -42,7 +42,8 @@ class ClassifierOptimizer(object):
 
         :param X:
         :param y:
-        :param path_to_experiments:
+        :param experiments_path:
+        :param experiments_name:
         :param max_evals:
         :param n_splits:
         :param verbose:
@@ -65,7 +66,6 @@ class ClassifierOptimizer(object):
                 max_evals=max_evals,
                 trials=trials
             )
-
         except KeyboardInterrupt:
             # saving experiments on exit
             self._save_experiments_results(
