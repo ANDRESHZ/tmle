@@ -1,7 +1,10 @@
+import os
+import pickle
 import numpy as np
 import hyperopt
 import sklearn
 
+from typing import Optional
 from functools import partial
 from sklearn.model_selection import StratifiedKFold
 from hyperopt import fmin, tpe, Trials, STATUS_OK
@@ -29,27 +32,56 @@ class ClassifierOptimizer(object):
             self,
             X: np.ndarray,
             y: np.ndarray,
+            experiments_path: str,
+            experiments_name: str,
             max_evals: int = 10,
             n_splits: int = 3,
             verbose: bool = True
-    ) -> None:
+    ) -> Optional[dict]:
         """
 
         :param X:
         :param y:
+        :param path_to_experiments:
+        :param max_evals:
         :param n_splits:
         :param verbose:
         :return:
         """
-        best_params = fmin(
-            fn=partial(
-                self.evaluate_params,
-                X=X, y=y, n_splits=n_splits, verbose=verbose
-            ),
-            space=self.space,
-            algo=tpe.suggest,
-            max_evals=max_evals
+        if os.path.exists(os.path.join(experiments_path, '.'.join([experiments_name, 'hpopt']))):
+            trials = pickle.load(open(os.path.join(experiments_path, '.'.join([experiments_name, 'hpopt'])), 'rb'))
+            max_evals = len(trials.trials) + max_evals
+        else:
+            trials = Trials()
+
+        try:
+            best_params = fmin(
+                fn=partial(
+                    self.evaluate_params,
+                    X=X, y=y, n_splits=n_splits, verbose=verbose
+                ),
+                space=self.space,
+                algo=tpe.suggest,
+                max_evals=max_evals,
+                trials=trials
+            )
+
+        except KeyboardInterrupt:
+            # saving experiments on exit
+            self._save_experiments_results(
+                trials=trials,
+                experiments_path=experiments_path,
+                experiments_name=experiments_name
+            )
+            return None
+
+        # save trials object for further usage
+        self._save_experiments_results(
+            trials=trials,
+            experiments_path=experiments_path,
+            experiments_name=experiments_name
         )
+
         return best_params
 
     def evaluate_params(
@@ -85,3 +117,18 @@ class ClassifierOptimizer(object):
             'status': STATUS_OK,
             'score': {'train': mean_score_train, 'valid': mean_score_valid}
         }
+
+    def _save_experiments_results(
+            self,
+            trials: hyperopt.Trials,
+            experiments_path: str,
+            experiments_name: str
+    ) -> None:
+        """
+
+        :param experiments_path:
+        :param experiments_name:
+        :return:
+        """
+        with open(os.path.join(experiments_path, '.'.join([experiments_name, 'hpopt'])), 'rb') as experiments:
+            pickle.dump(trials, experiments)
