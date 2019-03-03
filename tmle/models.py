@@ -1,9 +1,12 @@
+import os
+import time
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision
 
+from collections import defaultdict
 from typing import Optional, Tuple
 from sklearn.metrics import balanced_accuracy_score
 from .dataloaders import ImageFoldersDataset
@@ -21,24 +24,31 @@ class TransferLearning:
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
+        self.best_model = None
+        self.metrics = None
 
     def train(
             self,
             train_dataset: ImageFoldersDataset,
             test_dataset: ImageFoldersDataset,
+            model_dir: Optional[str] = None,
+            model_name: Optional[str] = None,
             n_epochs: int = 25,
             batch_size: int = 32,
             shuffle: bool = True
-    ) -> None:
+    ):
         """
 
         :param train_dataset:
         :param test_dataset:
+        :param model_dir:
+        :param model_name:
         :param n_epochs:
         :param batch_size:
         :param shuffle:
         :return:
         """
+        metrics = defaultdict(list)
         best_accuracy_test = 0.
         for epoch in range(n_epochs):
             running_loss = 0.0
@@ -60,13 +70,24 @@ class TransferLearning:
                     msg = '[%d, %5d] loss: %.3f'
                     print(msg % (epoch + 1, data_idx + 1, running_loss / 100))
                     running_loss = 0.0
+            # TODO(lukasz): measure accuracy_train during training.
             accuracy_train = self.score(train_dataset)
             accuracy_test = self.score(test_dataset)
+            metrics['acc_train'].append(accuracy_train)
+            metrics['acc_test'].append(accuracy_test)
             msg = '[%d] train score: %.3f, test score: %.3f'
             print(msg % (epoch + 1, accuracy_train, accuracy_test))
+            # save model (make sure that Google Colab do not destroy your results).
             if accuracy_test > best_accuracy_test:
-                # TODO(lukasz): save model state
-                pass
+                torch.save(
+                    self.model,
+                    os.path.join(model_dir, '.'.join([
+                        model_name + '_' + time.strftime('%Y%m%d%H%M', time.localtime(time.time())),
+                        'pth'])))
+                best_accuracy_test = accuracy_test
+
+        self.metrics = metrics
+        return self
 
     def score(self, dataset: ImageFoldersDataset) -> float:
         """
@@ -75,6 +96,9 @@ class TransferLearning:
         :return:
         """
         with torch.no_grad():
+            # remember that you must call `model.eval()` to set dropout and batch
+            # normalization layers to evaluation mode before running the inference.
+            self.model.eval()
             y_true, y_pred = np.zeros(len(dataset)), np.zeros(len(dataset))
             batch_idx = 0
             for data in dataset.loader(batch_size=32):
