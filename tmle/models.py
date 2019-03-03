@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -57,6 +58,7 @@ class TransferLearning:
                 if data_idx % 100 == 0:
                     msg = '[%d, %5d] loss: %.3f'
                     print(msg % (epoch + 1, data_idx + 1, running_loss / 100))
+                    running_loss = 0.0
             accuracy_train = self.score(train_dataset)
             accuracy_test = self.score(test_dataset)
             msg = '[%d] train score: %:.3f, test score: %:.3f'
