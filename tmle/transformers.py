@@ -11,10 +11,16 @@ from .dataloaders import ImageFoldersDataset
 
 class CNNFeatures(object):
 
-    def __init__(self, n_features: int, rm_top_layers: int):
+    def __init__(
+        self,
+        n_features: int,
+        rm_top_layers: int,
+        img_shape: tuple = (3, 224, 224)
+    ) -> None:
 
         self.n_features = n_features
         self.rm_top_layers = rm_top_layers
+        self.img_shape = img_shape
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def extract_features(
@@ -35,12 +41,12 @@ class CNNFeatures(object):
         X_codes, y_codes = np.zeros((len(dataset), self.n_features)), np.zeros(len(dataset))
         for data_idx, data in enumerate(dataset.dataset):
             inputs, labels = data
-            inputs = inputs.to(self.device)
-            labels = labels.to(self.device)
+            # add batch dimension
+            inputs = inputs.to(self.device).view(1, *self.img_shape)
             with torch.no_grad():
                 outputs = model_to_extractor(inputs).view(-1, self.n_features)
             X_codes[data_idx] = outputs.cpu().numpy()
-            y_codes[data_idx] = labels.cpu().numpy()
+            y_codes[data_idx] = labels
         return X_codes, y_codes
 
     def _remove_n_top_layers(
