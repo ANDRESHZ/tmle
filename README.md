@@ -8,6 +8,15 @@ This repository will guide you through the process of building an image classifi
 * [`02_dimension_reduction`]() presents ... .
 * [`03_transfer_learning`]() presents ... .
 
-References:
+# Package
 
-[1] Bergstra, James S., et al. “Algorithms for hyper-parameter optimization”. Advances in Neural Information Processing Systems. 2011.
+The *tmle* package provides methods useful (at least, in my opinion) in the problem of building an image classifier.
+
+* `dataloaders` module implements methods which helps to iterate over images stored in directories which corresponds to class membership, sample *mini-batches* of images used during training and loading all images to memory at once.
+* `model_selection` module implements methods which supports search for optimal *hyperparameters* of given classifier. It helps in storing results of optimization which can be reused in other experiments.
+* `models` module ... .
+* `transformers` module implements methods which allow to extract features from pretrained Convolutional Neural Networks (from `torchvision.models` or custom `CNN` trained with `torch`). It allows to use *histogram of oriented gradients* as part of `sklearn.Pipeline`.
+
+***References:***
+
+1. Bergstra, James S., et al. “Algorithms for hyper-parameter optimization”. Advances in Neural Information Processing Systems. 2011.
