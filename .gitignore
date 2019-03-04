@@ -3,6 +3,7 @@ dataset/
 data/
 .DS_Store
 *.tar
+*.npy
 
 # IDE
 .idea
