@@ -25,13 +25,15 @@ class CNNFeatures(object):
         """
 
         :param model:
+        :param dataset:
         :return:
         """
         model_to_extractor = self._remove_n_top_layers(model)
         model_to_extractor.eval()
+        model_to_extractor = model_to_extractor.to(self.device)
         # define placeholder for features and labels
         X_codes, y_codes = np.zeros((len(dataset), self.n_features)), np.zeros(len(dataset))
-        for data_idx, data in enumerate(dataset):
+        for data_idx, data in enumerate(dataset.dataset):
             inputs, labels = data
             inputs = inputs.to(self.device)
             labels = labels.to(self.device)
