@@ -41,6 +41,7 @@ class TransferLearning:
         metrics = defaultdict(list)
         best_accuracy_test = 0.
         for epoch in range(n_epochs):
+            model.train()
             running_loss = 0.0
             for data_idx, data in enumerate(train_dataset.loader(
                 batch_size=batch_size,
