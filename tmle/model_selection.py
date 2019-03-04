@@ -18,11 +18,11 @@ class ClassifierOptimizer(object):
             space: dict,
             metric: sklearn.metrics
     ) -> None:
-        """
+        """ClassifierOptimizer.
 
-        :param classifier:
-        :param space:
-        :param metric:
+        :param classifier: classifier.
+        :param space: space from which the hyperparameters values are drawn.
+        :param metric: the metric used to assess the model's performance.
         """
         self.classifier = classifier
         self.space = space
@@ -36,18 +36,30 @@ class ClassifierOptimizer(object):
             experiments_name: str,
             max_evals: int = 10,
             n_splits: int = 3,
+            overfit_penalty: Optional[float] = None,
             verbose: bool = True
     ) -> Optional[dict]:
-        """
+        """Find hyperparameters that minimize user-defined metric (`self.metric`).
 
-        :param X:
-        :param y:
-        :param experiments_path:
-        :param experiments_name:
-        :param max_evals:
-        :param n_splits:
-        :param verbose:
-        :return:
+        This method uses the Tree Parzen Estimator [1] to find hyperparameters values
+        that minimize the user-defined loss function (although, at this stage of development
+        it supports only metrics that use the output of `predict` method).
+        Obtained results are then stored in the `Trials` object and saved in given directory.
+        Experiment can be interrupted - results will be saved on exit.
+
+        References:
+        [1] Bergstra, James S., et al. “Algorithms for hyper-parameter optimization.”
+        Advances in Neural Information Processing Systems. 2011.
+
+        :param X: array-like or spare matrix of shape = [n_samples, n_features].
+        :param y: array-like, shape = [n_samples] or [n_samples, n_outputs].
+        :param experiments_path: path to directory when experiments are stored.
+        :param experiments_name: name of given experiment.
+        :param max_evals: allow up to this many function evaluations before returning.
+        :param n_splits: number of splits used during cross-validation.
+        :param overfit_penalty: additional penalty for overfitting (at training stage).
+        :param verbose: print out some information to stdout during search.
+        :return: dictionary with best parameters for given experiment run.
         """
         if os.path.exists(os.path.join(experiments_path, '.'.join([experiments_name, 'hpopt']))):
             trials = pickle.load(open(os.path.join(experiments_path, '.'.join([experiments_name, 'hpopt'])), 'rb'))
@@ -59,7 +71,10 @@ class ClassifierOptimizer(object):
             best_params = fmin(
                 fn=partial(
                     self.evaluate_params,
-                    X=X, y=y, n_splits=n_splits, verbose=verbose
+                    X=X, y=y,
+                    n_splits=n_splits,
+                    overfit_penalty=overfit_penalty,
+                    verbose=verbose
                 ),
                 space=self.space,
                 algo=tpe.suggest,
@@ -93,12 +108,21 @@ class ClassifierOptimizer(object):
             overfit_penalty: Optional[float] = None,
             verbose: bool = True
     ) -> dict:
-        """
+        """Evaluate hyperparameters.
 
-        :param X:
-        :param y:
-        :param clf_params:
-        :return:
+        This method was designed to evaluate a given set of parameters in conditions
+        of unbalanced dataset (hence, `StratifiedKFold` was used). Furthermore, a decision
+        was made to further penalize the overfitting (`overfit_penalty` simply adds some
+        constant to loss function in order to discourage `TPE` from sampling similar sets
+        of hyperparameters.
+
+        :param X: array-like or spare matrix of shape = [n_samples, n_features].
+        :param y: array-like, shape = [n_samples] or [n_samples, n_outputs].
+        :param clf_params: hyperparameters passed to given classifier.
+        :param n_splits: number of splits used during cross-validation.
+        :param overfit_penalty: additional penalty for overfitting (at training stage).
+        :param verbose: print out some information for given experiment run.
+        :return: dictionary with loss and information about metric values.
         """
         self.classifier.set_params(**clf_params)
         score_train, score_valid = [], []
@@ -115,7 +139,7 @@ class ClassifierOptimizer(object):
             print(msg.format(score_train=mean_score_train, score_valid=mean_score_valid))
         loss = 1 - mean_score_valid
         if overfit_penalty:
-            loss += np.where(mean_score_train - mean_score_valid > 0.1, 1, 0)
+            loss += np.where(mean_score_train - mean_score_valid > overfit_penalty, 1, 0)
         return {
             'loss': loss,
             'status': STATUS_OK,
@@ -127,8 +151,8 @@ class ClassifierOptimizer(object):
         `space_eval' from hyperopt is broken. See:
             https://github.com/hyperopt/hyperopt/issues/383
 
-        :param trials:
-        :return:
+        :param trials: object that stores information about experiments.
+        :return: dictionary with best parameters.
         """
         params = dict()
         for param in trials['misc']['vals']:
@@ -141,12 +165,11 @@ class ClassifierOptimizer(object):
             experiments_path: str,
             experiments_name: str
     ) -> None:
-        """
+        """Save experiments results.
 
-        :param trials:
-        :param experiments_path:
-        :param experiments_name:
-        :return:
+        :param trials: object that stores information about experiments.
+        :param experiments_path: path to directory when experiments are stored.
+        :param experiments_name: name of given experiment.
         """
         if not os.path.exists(experiments_path):
             os.makedirs(experiments_path)
