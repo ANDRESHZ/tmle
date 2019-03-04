@@ -10,7 +10,16 @@ from .dataloaders import ImageFoldersDataset
 
 
 class CNNFeatures(object):
+    """Feature extraction with Convolutional Neural Networks.
 
+    This class implements methods to deal with a problem of extracting
+    features from pretrained Convolutional Neural Networks. This class
+    was suited to models from `torchvision.models`.
+
+    :param n_features: number of features that will be extracted from CNN.
+    :param rm_top_layers: number of top layers that will be removed (recommended: 1).
+    :param img_shape: image shape (number_of_channels, img_width, img_height).
+    """
     def __init__(
         self,
         n_features: int,
@@ -28,11 +37,15 @@ class CNNFeatures(object):
             model: torchvision.models,
             dataset: ImageFoldersDataset
     ) -> Tuple[np.ndarray, np.ndarray]:
-        """
+        """Extracting features using given model.
 
-        :param model:
-        :param dataset:
-        :return:
+        After removing *n* top layers we will perform forward pass and will store
+        the obtained features in np.ndarray which will be used both for dimension
+        reduction and classification.
+
+        :param model: convolutional neural network which will be used as feature extractor.
+        :param dataset: dataset consists of images that will be transformed to feature vectors.
+        :return: features with corresponding labels.
         """
         model_to_extractor = self._remove_n_top_layers(model)
         model_to_extractor.eval()
@@ -53,10 +66,10 @@ class CNNFeatures(object):
             self,
             model: torchvision.models
     ) -> torch.nn.modules.container.Sequential:
-        """
+        """Remove top layers from network.
 
-        :param model:
-        :return:
+        :param model: convolutional neural network which will be used as feature extractor.
+        :return: convolutional neural network without top layers.
         """
         modules = list(model.children())[:-self.rm_top_layers]
         return nn.Sequential(*modules).to(self.device)
