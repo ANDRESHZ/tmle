@@ -90,6 +90,7 @@ class ClassifierOptimizer(object):
             X: np.ndarray,
             y: np.ndarray,
             n_splits: int = 3,
+            overfit_penalty: Optional[float] = None,
             verbose: bool = True
     ) -> dict:
         """
@@ -112,11 +113,27 @@ class ClassifierOptimizer(object):
         if verbose:
             msg = 'Train: {score_train:.4f}, valid: {score_valid:.4f}'
             print(msg.format(score_train=mean_score_train, score_valid=mean_score_valid))
+        loss = 1 - mean_score_valid
+        if overfit_penalty:
+            loss += np.where(mean_score_train - mean_score_valid > 0.1, 1, 0)
         return {
-            'loss': 1 - mean_score_valid,
+            'loss': loss,
             'status': STATUS_OK,
             'score': {'train': mean_score_train, 'valid': mean_score_valid}
         }
+
+    def space_eval(self, trials: hyperopt.Trials.best_trial) -> dict:
+        """Evaluate hyperparameters space and return best params as dict.
+        `space_eval' from hyperopt is broken. See:
+            https://github.com/hyperopt/hyperopt/issues/383
+
+        :param trials:
+        :return:
+        """
+        params = dict()
+        for param in trials['misc']['vals']:
+            params[param] = trials['misc']['vals'][param][0]
+        return hyperopt.space_eval(self.space, params)
 
     def _save_experiments_results(
             self,
