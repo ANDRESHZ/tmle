@@ -5,7 +5,7 @@ This repository will guide you through the process of building an image classifi
 # Notebooks
 
 * [`01_shallow_classifier`]() presents a method of training SVM (with linear kernel due to the performance issues) on top of histograms of oriented gradients. Choosing the best model is done by optimizing the parameters of the whole `Pipeline` with the use of a Tree Parzen Estimator [1].
-* [`02_dimension_reduction`]() presents ... .
+* [`02_dimension_reduction`]() presents dimensionality reduction techniques such as `PCA`, `t-SNE` and `UMAP`. We have shown how the hyperparameters of these techniques affect the resulting visualizations. We will then explore the possibility of using outlier detection methods (ie. Isolation Forest or {H}DBSCAN) to discover images with incorrectly assigned labels.
 * [`03_transfer_learning`]() presents ... .
 
 # Package
