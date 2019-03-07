@@ -1,11 +1,13 @@
 import os
 import pickle
 import numpy as np
+import pandas as pd
 import hyperopt
 import sklearn
 
 from typing import Optional
 from functools import partial
+from collections import defaultdict
 from sklearn.model_selection import StratifiedKFold
 from hyperopt import fmin, tpe, Trials, STATUS_OK
 
@@ -146,7 +148,21 @@ class ClassifierOptimizer(object):
             'score': {'train': mean_score_train, 'valid': mean_score_valid}
         }
 
-    def space_eval(self, trials: hyperopt.Trials.best_trial) -> dict:
+    def evaluate_experiments(self, trials: hyperopt.Trials.trials):
+        """Evaluate experiments conducted during training stage.
+
+        :param trials: object that stores information about experiments.
+        :return: DataFrame with summary of experiments.
+        """
+        experiments = defaultdict(list)
+        for trial in trials:
+            for param, value in self.space_eval(trial).items():
+                experiments[param].append(value)
+            for dataset, score in trial['result']['score'].items():
+                experiments[dataset].append(score)
+        return pd.DataFrame.from_dict(experiments)
+
+    def space_eval(self, trials: hyperopt.Trials.trials) -> dict:
         """Evaluate hyperparameters space and return best params as dict.
         `space_eval' from hyperopt is broken. See:
             https://github.com/hyperopt/hyperopt/issues/383
