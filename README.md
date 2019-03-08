@@ -71,7 +71,7 @@ The following is a brief summary of the functionalities of the individual module
 * `models` module implements manager which was used during *transfer learning* part of task.
 * `transformers` module implements methods which allow to extract features from pretrained Convolutional Neural Networks (especially from `torchvision.models`, but they support all models which were implemented in `torch`). This module consists of a `transformer` which allow to make `skimage.feature.hog` a part of `sklearn.Pipeline` (`TODO`: add voting known from `opencv` implementation of `HOGDescriptor`).
 
-***Resources:***
+# Resources
 
 1. https://papers.nips.cc/paper/4443-algorithms-for-hyper-parameter-optimization.pdf
 2. https://lvdmaaten.github.io/tsne/
