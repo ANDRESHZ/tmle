@@ -73,7 +73,11 @@ class TransferLearning(object):
             print(msg % (epoch + 1, score_train, score_test))
             # save model (make sure that Google Colab do not destroy your results)
             if score_test > best_score_test:
-                torch.save(model, self.save_experiment)
+                torch.save({
+                    'epoch': epoch,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict()
+                }, self.save_experiment)
                 best_score_test = score_test
         self.metrics = metrics
         return self
