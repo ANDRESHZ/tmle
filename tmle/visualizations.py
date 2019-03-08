@@ -84,7 +84,7 @@ def plot_confusion_matrix(
     formatter = '.2f'
     for row in range(matrix.shape[0]):
         for col in range(matrix.shape[1]):
-            ax.text(col, row, format(maxtrix[row, col], formatter),
+            ax.text(col, row, format(matrix[row, col], formatter),
                     ha='center', va='center', color='white')
     f.tight_layout()
     plt.show()
