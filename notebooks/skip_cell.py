@@ -1,3 +1,6 @@
+"""
+Extension comes from: https://stackoverflow.com/a/43584169
+"""
 def skip(line, cell=None):
     """Skips execution of the current cell if line evaluates to True."""
     if eval(line):
