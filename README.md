@@ -2,7 +2,9 @@
 
 This repository will guide you through the process of building an image classifier using the classic computer vision approach and transfer learning (using architectures such as ResNet, DenseNet, etc.).
 
-<img src='notebooks/figures/images_grid.png' width=700>
+Models were built on images coming from ten classes. The plot below shows randomly selected images from each class.
+<img src='notebooks/figures/images_grid.png'>
+The description of the methods used has been divided into separate notebooks.
 
 # Notebooks
 
