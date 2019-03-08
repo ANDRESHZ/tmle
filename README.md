@@ -13,10 +13,12 @@ Description of methods used to classify above images has been divided into separ
 # Notebooks
 
 * [Shallow classifier](https://github.com/stasulam/tmle/blob/master/notebooks/01_shallow_classifier.ipynb) presents a method of training SVM (with linear kernel) with histogram of oriented gradients used as a features. Choosing the best model is done by optimizing the parameters of the whole `Pipeline`. The algorithm used for hyperparameter tuning is Tree Parzen Estimator [1].
-* [Dimension reduction](https://github.com/stasulam/tmle/blob/master/notebooks/02_dimension_reduction.ipynb) presents dimensionality reduction techniques such as PCA, t-SNE [2] and UMAP [3]. We have shown how the hyperparameters of these techniques affect the resulting visualizations. We explored the possibility of usage of outlier detection methods as a way of finding incorrectly labeled images.
-* [Transfer learning](https://github.com/stasulam/tmle/blob/master/notebooks/03_transfer_learning.ipynb) presents methods of representing images as feature vectors obtained from Convolutional Neural Networks trained on different datasets. We have built SVM on top of feature vectors obtained from `ResNet18` and `ResNet50` (which were pretrained on `ImageNet`). Similarly to the shallow classifier, we optimized *hyperparameters* with TPE, but this time we performed much more experiments. Then, we have finetuned `ResNet18` with two different learning strategies. First, we used early stopping and manually modified learning rate and momentum parameters to obtain a well-performing network (avoiding overfitting). Next, we checked the capabilities of the recently published `AdaBound` [4]. Unfortunately, this gave worst results than first strategy.
+* [Dimension reduction](https://github.com/stasulam/tmle/blob/master/notebooks/02_dimension_reduction.ipynb) presents dimensionality reduction techniques such as PCA, t-SNE [2, 3] and UMAP [4]. We have shown how the hyperparameters of these techniques affect the resulting visualizations. We explored the possibility of usage of outlier detection methods as a way of finding incorrectly labeled images.
+* [Transfer learning](https://github.com/stasulam/tmle/blob/master/notebooks/03_transfer_learning.ipynb) presents methods of representing images as feature vectors obtained from Convolutional Neural Networks trained on different datasets. We have built SVM on top of feature vectors obtained from `ResNet18` and `ResNet50` (which were pretrained on `ImageNet`). Similarly to the shallow classifier, we optimized *hyperparameters* with TPE, but this time we performed much more experiments. Then, we have finetuned `ResNet18` with two different learning strategies. First, we used early stopping and manually modified learning rate and momentum parameters to obtain a well-performing network (avoiding overfitting). Next, we checked the capabilities of the recently published `AdaBound` [5]. Unfortunately, this gave worst results than first strategy.
 
-Results (on test set):
+## Results
+
+The following table shows the results obtained on the test set.
 
 | Model                      | Balanced accuracy score |
 | ---------------------------|------------------------:|
@@ -26,7 +28,9 @@ Results (on test set):
 | ResNet18 (first strategy)  |0.8940                   |
 | ResNet18 (second strategy) |0.8630 (overfitting)     |
 
-Further works:
+## Further works
+
+Promising directions:
 
 * add `sampler` during loading images to mini-batches in order to measure the impact of class imbalanced.
 * use outliers detection methods to remove incorrectly labeled images from dataset.
@@ -56,16 +60,17 @@ In order to use `tmle` on Google Colab use:
 
 ## Summary
 
-
+The following is a brief summary of the functionalities of the individual modules:
 
 * `dataloaders` module implements methods which helps to iterate over images stored in directories which corresponds to class membership, sample *mini-batches* of images used during training and loading all images to memory at once.
 * `model_selection` module implements methods which supports search for optimal *hyperparameters* of given classifier. It helps in storing results of optimization which can be reused in other experiments.
 * `models` module ... .
 * `transformers` module implements methods which allow to extract features from pretrained Convolutional Neural Networks (from `torchvision.models` or custom `CNN` trained with `torch`). It allows to use *histogram of oriented gradients* as part of `sklearn.Pipeline`.
 
-***References:***
+***Resources:***
 
-1. Bergstra, James S., et al. “Algorithms for hyper-parameter optimization”. Advances in Neural Information Processing Systems. 2011.
-2. L.J.P. van der Maaten and G.E. Hinton. Visualizing High-Dimensional Data Using t-SNE. Journal of Machine Learning Research, 2008.
-3. UMAP
-4. AdaBound
+1. https://papers.nips.cc/paper/4443-algorithms-for-hyper-parameter-optimization.pdf
+2. https://lvdmaaten.github.io/tsne/
+3. https://distill.pub/2016/misread-tsne/
+4. https://github.com/lmcinnes/umap
+5. https://github.com/Luolc/AdaBound
