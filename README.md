@@ -4,7 +4,9 @@ This repository will guide you through the process of building an image classifi
 
 Models were built on images coming from ten classes. The plot below shows randomly selected images from each class.
 
-<img src='notebooks/figures/images_grid.png' width=600 align='middle'>
+<p align="center">
+    <img src="notebooks/figures/images_grid.png" width="600">
+</p>
 
 The description of the methods used has been divided into separate notebooks.
 
