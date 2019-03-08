@@ -62,7 +62,7 @@ In order to use `tmle` on Google Colab use:
 !pip install pillow==4.1.1
 ```
 
-## Summary
+## Overview
 
 The following is a brief summary of the functionalities of the individual modules:
 
