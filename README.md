@@ -2,6 +2,8 @@
 
 This repository will guide you through the process of building an image classifier using the classic computer vision approach and transfer learning (using architectures such as ResNet, DenseNet, etc.).
 
+<img src='notebooks/figures/images_grid.png' width=700>
+
 # Notebooks
 
 * [`01_shallow_classifier`]() presents a method of training SVM (with linear kernel due to the performance issues) on top of histograms of oriented gradients. Choosing the best model is done by optimizing the parameters of the whole `Pipeline` with the use of a Tree Parzen Estimator [1].
@@ -20,3 +22,5 @@ The *tmle* package provides methods useful (at least, in my opinion) in the prob
 ***References:***
 
 1. Bergstra, James S., et al. “Algorithms for hyper-parameter optimization”. Advances in Neural Information Processing Systems. 2011.
+2. L.J.P. van der Maaten and G.E. Hinton. Visualizing High-Dimensional Data Using t-SNE. Journal of Machine Learning Research, 2008.
+3. 
